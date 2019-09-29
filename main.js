@@ -1,12 +1,45 @@
 //THESE ARE THE DEFAULT WORD BANKS
-var oneBank = ["visually rich", "non-visual", "family/Inter-generational", "immersive", "hands on", "surprising", "memorable", "critical", "speculative", "educational", "compact", "funny","engaging", "inclusive", "shocking","relaxing","provocative","intuitive","illustrated","lo-poly","sarcastic","impromptu","visceral symphony","anthropophagic"]
-var twoBank = ["vr", "AR", "AI", "wearable","Processing","chatbot","sculptural","Open frameworks","P5.js","interactive fiction","sketch","painting","written","analog","projection mapping","film","animated","hand made","IoT","digital","sharable","Chrome extension"]
-var threeBank = ["game", "installation", "data visualization", "social experiment","manifesto","product","documentary","app","service","promotional piece","recipe","training service","collage","song","conversation","narrative","public intervention","performance","comic book","instrument","web series"]
-var fourBank = ["societal", "personal", "global", "reusable", "emotional","interactive","surprising","replayable","shocking","cross-platform","thought-provoking","darkly humorous","portable","surprising","multiplayer","emapathetic","meditative","confrontational","a series","political","instructional","contrasting","overlapping","malleable","flexible","visceral","tattooed","multi-layered","foldable","adaptive","organic"]
-var fiveBank = ["disconnectedness", "wealth disparity", "nature", "communication","empathy","being blind","memory","time","travel","connection","childhood","resistance","duality","resonance","decrepitude beauty","collapsible reality","separate identities merging in single entity","becoming flower","cultivating cosmos","what is beneath the surface","various kinds of rain","the prenatal experience","personification","embryonic meditation","falling from one realm into another","limitless dimension","past and future coexisting within","imperceptibly existing love","devour and be devoured","life before eating the apple of Eden","innocent devouring","finding new eye","desire to conquer the universe","floating resistance"]
-var sixBank = ["children under 10", "designers", "professionals", "couples","seniors","pre-teens","teens","special needs persons","the blind","the deaf","refugees","students","teachers","the LGBTQ community","immigrants","my family","myself","gamers","art galleries","serial killers","toddlers","minorities","passionate people","dreamers","those who believe that there is something beyond this reality","anthropophagi","cosmic (wo)man","humans from the future","extra terrastrial humans and non humans","cyborgs","robots","Artificial Intelligence"]
+// var oneBank = ["visually rich", "non-visual", "family/Inter-generational", "immersive", "hands on", "surprising", "memorable", "critical", "speculative", "educational", "compact", "funny","engaging", "inclusive", "shocking","relaxing","provocative","intuitive","illustrated","lo-poly","sarcastic","impromptu","visceral symphony","anthropophagic"]
+// var twoBank = ["vr", "AR", "AI", "wearable","Processing","chatbot","sculptural","Open frameworks","P5.js","interactive fiction","sketch","painting","written","analog","projection mapping","film","animated","hand made","IoT","digital","sharable","Chrome extension"]
+// var threeBank = ["game", "installation", "data visualization", "social experiment","manifesto","product","documentary","app","service","promotional piece","recipe","training service","collage","song","conversation","narrative","public intervention","performance","comic book","instrument","web series"]
+// var fourBank = ["societal", "personal", "global", "reusable", "emotional","interactive","surprising","replayable","shocking","cross-platform","thought-provoking","darkly humorous","portable","surprising","multiplayer","emapathetic","meditative","confrontational","a series","political","instructional","contrasting","overlapping","malleable","flexible","visceral","tattooed","multi-layered","foldable","adaptive","organic"]
+// var fiveBank = ["disconnectedness", "wealth disparity", "nature", "communication","empathy","being blind","memory","time","travel","connection","childhood","resistance","duality","resonance","decrepitude beauty","collapsible reality","separate identities merging in single entity","becoming flower","cultivating cosmos","what is beneath the surface","various kinds of rain","the prenatal experience","personification","embryonic meditation","falling from one realm into another","limitless dimension","past and future coexisting within","imperceptibly existing love","devour and be devoured","life before eating the apple of Eden","innocent devouring","finding new eye","desire to conquer the universe","floating resistance"]
+// var sixBank = ["children under 10", "designers", "professionals", "couples","seniors","pre-teens","teens","special needs persons","the blind","the deaf","refugees","students","teachers","the LGBTQ community","immigrants","my family","myself","gamers","art galleries","serial killers","toddlers","minorities","passionate people","dreamers","those who believe that there is something beyond this reality","anthropophagi","cosmic (wo)man","humans from the future","extra terrastrial humans and non humans","cyborgs","robots","Artificial Intelligence"]
+var oneBank = [];
+var twoBank = [];
+var threeBank = [];
+var fourBank = [];
+var fiveBank = [];
+var sixBank = []
 
 
+var spData = null;
+  function doData(json) {
+      spData = json.feed.entry;
+      for (var i = spData.length - 1; i >= 0; i--) {
+      	var col = spData[i]["gs$cell"]["col"]
+      	var txt = spData[i]["gs$cell"]["$t"]
+ 		
+ 		if(col == 1){
+ 			oneBank.push(txt)
+ 		}else if (col == 2){
+ 			twoBank.push(txt)
+ 		}else if (col == 3){
+ 			threeBank.push(txt)
+ 		}else if (col == 4){
+ 			fourBank.push(txt)
+ 		}else if (col == 5){
+ 			fiveBank.push(txt)
+ 		}else if (col == 6){
+ 			sixBank.push(txt)
+ 		}
+      }
+      // console.log(spData)
+      // console.log(spData[0]["gs$cell"]["col"])
+      // console.log(spData[0]["gs$cell"]["$t"])
+  }
+  
+  
 
 $(document).ready(function(){
 //shuffle function
@@ -55,7 +88,7 @@ $(document).ready(function(){
 	}
 //POPULATING DROPDOWNS
 	//one
-	console.log(JSON.parse(localStorage.getItem('one')))
+	// console.log(JSON.parse(localStorage.getItem('one')))
 
 	var myOne = JSON.parse(localStorage.getItem('one')) || oneBank;
 	var myTwo = JSON.parse(localStorage.getItem('two')) || twoBank;
