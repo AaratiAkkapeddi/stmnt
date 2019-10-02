@@ -316,6 +316,79 @@ h1{
 	font-size:24px;
 
 }
+
+
+
+.project-body .dropdown.open{
+	display:block;
+	width: 60%;
+	left: 50%;
+	top: 50px;
+	transform: translateX(-50%);
+    overflow: scroll;
+    z-index: 9;
+    height: auto;
+}
+ .goal-card{
+		background:#5079A5;
+}
+ .vision-card{
+		background:#F18E3B;
+}
+ .process-card{
+		background:#DF575B;
+}
+.action-card{
+		background:#5CA053;
+}
+.reach-card{
+		background:#AE7AA0;
+}
+.project-body .dropdown .options{
+	text-align:center;
+}
+.dropdown .card{
+	display: inline-block;
+    margin: 5px;
+    vertical-align: top;
+    /* float: left; */
+    transform: none;
+    text-align:center;
+    width: 200px;
+}
+.dropdown .card h1{
+	height: 130px;
+    font-size: 20px;
+    font-weight: normal;
+}
+.dropdown .card h3{
+	    color: white;
+    font-size: 14px;
+    height: 120px;
+
+}
+.project-body .lock.on svg path{
+	fill: white;
+}
+.project-body .lock svg path{
+	fill: white;
+}
+.project-body .lock svg{
+	width: 20px;
+    vertical-align: middle;
+}
+.project-body .lock svg:first-child{
+	display: inline-block;
+}
+.project-body .lock svg:last-child{
+	display: none;
+}
+.project-body .lock.on svg:first-child{
+	display: none;
+}
+.project-body .lock.on svg:last-child{
+	display: inline-block;
+}
 /* MOBILE */
 @media(max-width: 768px) {
 	h1{

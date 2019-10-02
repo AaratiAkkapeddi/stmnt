@@ -250,6 +250,9 @@ var reachbank = [
 ]
 
 
+
+
+
 function makeCard(h1, h3){
 	var card = $('<div></div>')
 	card.addClass('card');
@@ -266,47 +269,54 @@ function setTicker(which, array){
 	ticker.text(text)
 }
 
-for (var i = goalsbank.length - 1; i >= 0; i--) {
-	var h1 = goalsbank[i][0]
-	var h3 = goalsbank[i][1]
-	var card = makeCard(h1, h3)
-	$('#goals .cards').prepend(card)
-	setTicker("goals", goalsbank)
-}
-for (var i = visionbank.length - 1; i >= 0; i--) {
-	var h1 = visionbank[i][0]
-	var h3 = visionbank[i][1]
-	var card = makeCard(h1, h3)
-	$('#vision .cards').prepend(card)
-	setTicker("vision", visionbank)
-}
-for (var i = actionbank.length - 1; i >= 0; i--) {
-	var h1 = actionbank[i][0]
-	var h3 = actionbank[i][1]
-	var card = makeCard(h1, h3)
-	$('#action .cards').prepend(card)
-	setTicker("action", actionbank)
-}
-for (var i = processbank.length - 1; i >= 0; i--) {
-
-	var h1 = processbank[i][0]
-	var h3 = processbank[i][1]
-	var card = makeCard(h1, h3)
-	console.log(card)
-	$('#process .cards').prepend(card)
-	setTicker("process", processbank)
-}
-for (var i = reachbank.length - 1; i >= 0; i--) {
-	var h1 = reachbank[i][0]
-	var h3 = reachbank[i][1]
-	var card = makeCard(h1, h3)
-	$('#reach .cards').prepend(card)
-	setTicker("reach", reachbank)
+var current_cards = []
+var locked = []
+function pushCards(bank, my_class){
+	for (var i = bank.length - 1; i >= 0; i--) {
+			var h1 = bank[i][0]
+			var h3 = bank[i][1]
+			current_cards.push([h1, h3, my_class])
+		}
 }
 
 
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
 
-var cardsCarousel = $('#goals .cards').flickity({
+if(localStorage.getItem('current_cards')){
+	current_cards = JSON.parse(localStorage.getItem('current_cards'))
+}else{
+	pushCards(goalsbank, 'goal-card')
+	pushCards(visionbank, 'vision-card')
+	pushCards(actionbank, 'action-card')
+	pushCards(processbank, 'process-card')
+	pushCards(reachbank, 'reach-card')
+	shuffleArray(current_cards)
+	localStorage.setItem('current_cards',JSON.stringify(current_cards))
+
+}
+
+if(localStorage.getItem('locked')){
+	var localLocked = JSON.parse(localStorage.getItem('locked'));
+	for (var i = localLocked.length - 1; i >= 0; i--) {
+		$(localLocked[i] + " .lock").addClass('on')
+	}
+}
+
+
+for (var i = current_cards.length - 1; i >= 0; i--) {
+	card = makeCard(current_cards[i][0],current_cards[i][1])
+	card.addClass(current_cards[i][2])
+	$('#full .cards').prepend(card)
+}
+
+setTicker("full", current_cards)
+
+var cardsCarousel = $('#full .cards').flickity({
 	draggable: false,
 	wrapAround: true,
 	freeScroll: false,
@@ -318,133 +328,198 @@ cardsCarousel.on( 'select.flickity', function( event, index ) {
   var ticker = $(this).parent().find('.ticker')
   var newtext = (index + 1)+'/'+ticker.text().split('/')[1]
   ticker.text(newtext)
-
 });
 
+function resetCards(){
+	cardsCarousel.flickity('destroy');
+	shuffleArray(current_cards)
+	localStorage.setItem('current_cards',JSON.stringify(current_cards))
+	$('#full .cards .card').remove();
 
+	for (var i = current_cards.length - 1; i >= 0; i--) {
+		card = makeCard(current_cards[i][0],current_cards[i][1])
+		card.addClass(current_cards[i][2])
+		$('#full .cards').prepend(card)
+	}
 
+	setTicker("full", current_cards)
 
+	cardsCarousel = $('#full .cards').flickity({
+		draggable: false,
+		wrapAround: true,
+		freeScroll: false,
+		autoPlay: false,
+		pageDots: false
+	})
 
+	cardsCarousel.on( 'select.flickity', function( event, index ) {
+	  var ticker = $(this).parent().find('.ticker')
+	  var newtext = (index + 1)+'/'+ticker.text().split('/')[1]
+	  ticker.text(newtext)
+	});
+}
 
-
-$('.one').on('click', function(){
-	$('.cards-wrapper').removeClass('on')
-var $carousel = $('.flickity-enabled')
-$carousel.flickity('destroy');
-
-	$('#goals').addClass('on')
-
-
-var cardsCarousel = $('#goals .cards').flickity({
-	draggable: false,
-	wrapAround: true,
-	freeScroll: false,
-	autoPlay: false,
-	pageDots: false
+$('.one .lock').on('click',function(){
+	if($(this).hasClass('on')){
+		locked.splice(locked.indexOf(".one"),1);
+		localStorage.setItem('locked',JSON.stringify(locked))
+		$(this).removeClass('on');
+		pushCards(goalsbank, 'goal-card')
+		shuffleArray(current_cards)
+		resetCards()
+	}else{
+		$(this).addClass('on');
+		locked.push('.one')
+		localStorage.setItem('locked',JSON.stringify(locked))
+		//remove these cards
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'goal-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		resetCards()
+	}
 })
 
-cardsCarousel.on( 'select.flickity', function( event, index ) {
-  var ticker = $(this).parent().find('.ticker')
-  var newtext = (index + 1)+'/'+ticker.text().split('/')[1]
-  ticker.text(newtext)
 
-});
-
-
-})
-$('.two').on('click', function(){
-	$('.cards-wrapper').removeClass('on')
-	var $carousel = $('.flickity-enabled')
-$carousel.flickity('destroy');
-	$('#vision').addClass('on')
-
-
-var cardsCarousel = $('#vision .cards').flickity({
-	draggable: false,
-	wrapAround: true,
-	freeScroll: false,
-	autoPlay: false,
-	pageDots: false
-})
-
-cardsCarousel.on( 'select.flickity', function( event, index ) {
-  var ticker = $(this).parent().find('.ticker')
-  var newtext = (index + 1)+'/'+ticker.text().split('/')[1]
-  ticker.text(newtext)
-
-});
-
-
-})
-$('.three').on('click', function(){
-	$('.cards-wrapper').removeClass('on')
-	var $carousel = $('.flickity-enabled')
-$carousel.flickity('destroy');
-	$('#process').addClass('on')
-
-
-var cardsCarousel = $('#process .cards').flickity({
-	draggable: false,
-	wrapAround: true,
-	freeScroll: false,
-	autoPlay: false,
-	pageDots: false
+$('.two .lock').on('click',function(){
+	if($(this).hasClass('on')){
+		locked.splice(locked.indexOf(".two"),1);
+		localStorage.setItem('locked',JSON.stringify(locked))
+		$(this).removeClass('on');
+		pushCards(visionbank, 'vision-card')
+		shuffleArray(current_cards)
+		resetCards()
+	}else{
+		$(this).addClass('on');
+		locked.push('.two')
+		localStorage.setItem('locked',JSON.stringify(locked))
+		//remove these cards
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'vision-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		localStorage.setItem('current_cards',JSON.stringify(current_cards))
+		resetCards()
+	}
 })
 
-cardsCarousel.on( 'select.flickity', function( event, index ) {
-  var ticker = $(this).parent().find('.ticker')
-  var newtext = (index + 1)+'/'+ticker.text().split('/')[1]
-  ticker.text(newtext)
-
-});
-
-
-})
-$('.five').on('click', function(){
-	$('.cards-wrapper').removeClass('on')
-	var $carousel = $('.flickity-enabled')
-$carousel.flickity('destroy');
-	$('#action').addClass('on')
-
-
-var cardsCarousel = $('#action .cards').flickity({
-	draggable: false,
-	wrapAround: true,
-	freeScroll: false,
-	autoPlay: false,
-	pageDots: false
+$('.five .lock').on('click',function(){
+	if($(this).hasClass('on')){
+		locked.splice(locked.indexOf(".five"),1);
+		localStorage.setItem('locked',JSON.stringify(locked))
+		$(this).removeClass('on');
+		pushCards(actionbank, 'action-card')
+		shuffleArray(current_cards)
+		resetCards()
+	}else{
+		$(this).addClass('on');
+		locked.push('.five')
+		localStorage.setItem('locked',JSON.stringify(locked))
+		//remove these cards
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'action-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		resetCards()
+	}
 })
 
-cardsCarousel.on( 'select.flickity', function( event, index ) {
-  var ticker = $(this).parent().find('.ticker')
-  var newtext = (index + 1)+'/'+ticker.text().split('/')[1]
-  ticker.text(newtext)
-
-});
-
-
-})
-$('.six').on('click', function(){
-	$('.cards-wrapper').removeClass('on')
-	var $carousel = $('.flickity-enabled')
-$carousel.flickity('destroy');
-	$('#reach').addClass('on')
-
-
-var cardsCarousel = $('#reach .cards').flickity({
-	draggable: false,
-	wrapAround: true,
-	freeScroll: false,
-	autoPlay: false,
-	pageDots: false
+$('.three .lock').on('click',function(){
+	if($(this).hasClass('on')){
+		locked.splice(locked.indexOf(".three"),1);
+		localStorage.setItem('locked',JSON.stringify(locked))
+		$(this).removeClass('on');
+		pushCards(processbank, 'process-card')
+		shuffleArray(current_cards)
+		resetCards()
+	}else{
+		$(this).addClass('on');
+		locked.push('.three')
+		localStorage.setItem('locked',JSON.stringify(locked))
+		//remove these cards
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'process-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		resetCards()
+	}
 })
 
-cardsCarousel.on( 'select.flickity', function( event, index ) {
-  var ticker = $(this).parent().find('.ticker')
-  var newtext = (index + 1)+'/'+ticker.text().split('/')[1]
-  ticker.text(newtext)
-
-});
-
-
+$('.six .lock').on('click',function(){
+	if($(this).hasClass('on')){
+		locked.splice(locked.indexOf(".six"),1);
+		localStorage.setItem('locked',JSON.stringify(locked))
+		$(this).removeClass('on');
+		pushCards(reachbank, 'reach-card')
+		shuffleArray(current_cards)
+		resetCards()
+	}else{
+		$(this).addClass('on');
+		locked.push('.six')
+		localStorage.setItem('locked',JSON.stringify(locked))
+		//remove these cards
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'reach-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		resetCards()
+	}
 })
+
+
+
+//POPULATING DROPDOWNS
+	//one
+	// console.log(JSON.parse(localStorage.getItem('one')))
+
+	var myOne = JSON.parse(localStorage.getItem('goals')) || goalsbank;
+	var myTwo = JSON.parse(localStorage.getItem('vision')) || visionbank;
+	var myThree = JSON.parse(localStorage.getItem('process')) || processbank;
+	var myFive = JSON.parse(localStorage.getItem('action')) || actionbank;
+	var mySix = JSON.parse(localStorage.getItem('reach')) || reachbank;
+	console.log(myOne)
+
+	for (var i = myOne.length - 1; i >= 0; i--) {
+		var el = makeCard(myOne[i][0], myOne[i][1])
+		el.addClass('goal-card')
+		$('.one .dropdown .options').append(el)
+	}
+
+
+	for (var i = myTwo.length - 1; i >= 0; i--) {
+		var el = makeCard(myTwo[i][0], myTwo[i][1])
+		el.addClass('vision-card')
+		$('.two .dropdown .options').append(el)
+	}
+
+
+	//three
+	for (var i = myThree.length - 1; i >= 0; i--) {
+		var el = makeCard(myThree[i][0], myThree[i][1])
+		el.addClass('process-card')
+		$('.three .dropdown .options').append(el)
+	}
+
+
+	//four
+	//five
+	for (var i = myFive.length - 1; i >= 0; i--) {
+		var el = makeCard(myFive[i][0], myFive[i][1])
+		el.addClass('action-card')
+		$('.five .dropdown .options').append(el)
+	}
+
+
+	//six
+	for (var i = mySix.length - 1; i >= 0; i--) {
+		var el = makeCard(mySix[i][0], mySix[i][1])
+		el.addClass('reach-card')
+		$('.six .dropdown .options').append(el)
+	}
+
+
