@@ -1,4 +1,4 @@
-var goalsbank =[
+var goalsbank1 =[
 				["What does the client say they want?", "In contrast, what do you think they need?"],
 				["What are you making?", "Is it a product or service? Describe its value."],
 				["Who is your competition?", "List the companies doing similar work. List their products"],
@@ -43,7 +43,7 @@ var goalsbank =[
 				["When will this happen?","What are the start and end dates?"]
 				]
 
-var visionbank = [
+var visionbank1 = [
 				["It's good to deliver what is expected but one way to be remembered is to offer surprise", "What about this will be surprising?"],
 				["There are three paths to take when considering innovation. 1) Continue doing what’s been done previously 2) Push things into unexpected territory but maintain the essence of what’s been seen previously or 3) Upend things. Boldly do something unlike what’s been done before.", "Which path are you taking? Why? How?"],
 				["Name an obstacle that might slow you down", "Money, skills, tools, Confidence, etc. How can you address it?"],
@@ -110,7 +110,7 @@ var visionbank = [
 
 
 
-var processbank = [
+var processbank1 = [
 				["What is your plan for meetings?", "If regular meetings are needed, schedule them"],
 				["How should you be communicating?", "Email? Messaging?"],
 				["What is your development process", "Agile? Scrum? Kanban? etc"],
@@ -154,7 +154,7 @@ var processbank = [
 
 
 
-var actionbank = [
+var actionbank1 = [
 ["Does everyone have clarity on what they should be working on?","If not, why? What can be done about this?"],
 ["Have you done enough research?","If not, what’s missing?"],
 ["Stuck on something?","Describe your issue to someone"],
@@ -200,7 +200,7 @@ var actionbank = [
 
 
 
-var reachbank = [
+var reachbank1 = [
 ["Who are you making this for?","How do you know they’re your target audience?"],
 ["How old is your audience?","How do you know their age? What about that age makes them your target?"],
 ["Are you making something niche or mass market? ","If it’s niche, who/what is the niche?"],
@@ -250,18 +250,126 @@ var reachbank = [
 ]
 
 
+var goalsbank1 = [];
+var visionbank1 = [];
+var processbank1 = [];
+var actionbank1 = [];
+var reachbank1 = []
 
+
+var spData = null;
+  function doData(json) {
+      spData = json.feed.entry;
+      for (var i = spData.length - 1; i >= 0; i--) {
+      	var col = spData[i]["gs$cell"]["col"]
+      	var txt = spData[i]["gs$cell"]["$t"]
+ 		
+ 		if(col == 1){
+ 			goalsbank1.push(JSON.parse(txt))
+ 		}else if (col == 2){
+ 			visionbank1.push(JSON.parse(txt))
+ 		} else if (col == 3){
+ 			processbank1.push(JSON.parse(txt))
+ 		}else if (col == 4){
+ 			actionbank1.push(JSON.parse(txt))
+ 		}else if (col == 5){
+ 			reachbank1.push(JSON.parse(txt))
+ 		}
+      }
+      // console.log(spData)
+      // console.log(spData[0]["gs$cell"]["col"])
+      // console.log(spData[0]["gs$cell"]["$t"])
+
+
+
+
+if(localStorage.getItem('goalsbank')){
+	goalsbank = JSON.parse(localStorage.getItem('goalsbank'))
+} else{
+	goalsbank = goalsbank1
+	localStorage.setItem('goalsbank', JSON.stringify(goalsbank))
+}
+if(localStorage.getItem('visionbank')){
+	visionbank = JSON.parse(localStorage.getItem('visionbank'))
+} else{
+	visionbank = visionbank1
+	localStorage.setItem('visionbank', JSON.stringify(visionbank))
+}
+if(localStorage.getItem('actionbank')){
+	actionbank = JSON.parse(localStorage.getItem('actionbank'))
+} else{
+	actionbank = actionbank1
+	localStorage.setItem('actionbank', JSON.stringify(actionbank))
+}
+if(localStorage.getItem('processbank')){
+	processbank = JSON.parse(localStorage.getItem('processbank'))
+} else{
+	processbank = processbank1
+	localStorage.setItem('processbank', JSON.stringify(processbank))
+}
+if(localStorage.getItem('reachbank')){
+	reachbank = JSON.parse(localStorage.getItem('reachbank'))
+} else{
+	reachbank = reachbank1
+	localStorage.setItem('reachbank', JSON.stringify(reachbank))
+}
 
 
 function makeCard(h1, h3){
 	var card = $('<div></div>')
 	card.addClass('card');
+	var exit = $('<p>-</p>');
+	exit.addClass('card-exit')
 	var h1 = $('<h1>' + h1 + '</h1>');
 	var h3 = $('<h3>' + h3 + '</h3>');
+	card.append(exit)
 	card.append(h1)
 	card.append(h3)
+	$(exit).on('click', function(){
+		console.log('meow')
+		var h1 = $(this).parent().find('h1').text()
+		var h3 = $(this).parent().find('h3').text()
+		var parentClass = $(this).parent().attr('class').split(' ')[1]
+		if(parentClass == 'goal-card'){
+			goalsbank.splice(goalsbank.indexOf([h1, h3]), 1)
+			localStorage.setItem('goalsbank', JSON.stringify(goalsbank))	
+		}else if(parentClass == 'action-card'){
+			actionbank.splice(actionbank.indexOf([h1, h3]), 1)
+			localStorage.setItem('actionbank', JSON.stringify(actionbank))
+		}else if(parentClass == 'vision-card'){
+			visionbank.splice(visionbank.indexOf([h1, h3]), 1)
+			localStorage.setItem('visionbank', JSON.stringify(visionbank))
+		}else if(parentClass == 'process-card'){
+			processbank.splice(processbank.indexOf([h1, h3]), 1)
+			localStorage.setItem('processbank', JSON.stringify(processbank))
+		}else if(parentClass == 'reach-card'){
+			reachbank.splice(reachbank.indexOf([h1, h3]), 1)
+			for (var i = reachbank.length - 1; i >= 0; i--) {
+				console.log('"'+h1.trim() + '"')
+				console.log('"'+reachbank[i][0].trim() + '"')
+				if(reachbank[i][0].trim() == h1.trim()){
+				
+					console.log('we did it')
+					reachbank.splice(i,1)
+				}
+			}
+			localStorage.setItem('reachbank', JSON.stringify(reachbank))
+		}
+
+		current_cards.splice(current_cards.indexOf([h1, h3, parentClass]), 1)
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][0] == h1){
+				current_cards.splice(i,1)
+			}
+		}
+		localStorage.setItem('current_cards', JSON.stringify(current_cards))
+		$(this).parent().remove()
+		resetCards()
+
+	})
 	return card
 }
+
 function setTicker(which, array){
 	total = array.length
 	var text = "1/"+ total
@@ -278,6 +386,7 @@ function pushCards(bank, my_class){
 			current_cards.push([h1, h3, my_class])
 		}
 }
+
 
 
 function shuffleArray(array) {
@@ -358,6 +467,30 @@ function resetCards(){
 	  ticker.text(newtext)
 	});
 }
+
+$('.dropdown-trigger').on('click', function(){
+ 	
+	if($(this).parent().find('.dropdown').hasClass('open')){
+		$(this).parent().find('.dropdown').removeClass('open')
+	} else{
+		$(this).parent().find('.dropdown').addClass('open')
+	}
+
+})
+$(document).mouseup(function(e) 
+	{
+	    var container = $(".buttons");
+	    // if the target of the click isn't the container nor a descendant of the container
+	    if (!container.is(e.target) && container.has(e.target).length === 0) 
+	    {
+	        container.find('.dropdown').removeClass('open');
+	        $('body').removeClass('side')
+	    }
+	});
+
+$('.dropdown-exit').on('click', function(){
+	$(this).parent().removeClass('open')
+})
 
 $('.one .lock').on('click',function(){
 	if($(this).hasClass('on')){
@@ -482,9 +615,10 @@ $('.six .lock').on('click',function(){
 	var myThree = JSON.parse(localStorage.getItem('process')) || processbank;
 	var myFive = JSON.parse(localStorage.getItem('action')) || actionbank;
 	var mySix = JSON.parse(localStorage.getItem('reach')) || reachbank;
-	console.log(myOne)
+
 
 	for (var i = myOne.length - 1; i >= 0; i--) {
+		console.log(myOne[i])
 		var el = makeCard(myOne[i][0], myOne[i][1])
 		el.addClass('goal-card')
 		$('.one .dropdown .options').append(el)
@@ -522,4 +656,139 @@ $('.six .lock').on('click',function(){
 		$('.six .dropdown .options').append(el)
 	}
 
+$('.restore').on('click', function(){
+	var bank = $(this).attr('data-bank')
+	if(bank == 'one'){
+		localStorage.setItem('goalsbank',JSON.stringify(goalsbank1))
+		$('.one .dropdown .options').empty()
+		for (var i = goalsbank1.length - 1; i >= 0; i--) {
+			var el = makeCard(goalsbank1[i][0], goalsbank1[i][1])
+			el.addClass('goals-card')
+			$('.one .dropdown .options').append(el)
+		}
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'goals-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		pushCards(goalsbank1, 'goal-card')
+		shuffleArray(current_cards)
+	}else if(bank == 'two'){
+		localStorage.setItem('visionbank',JSON.stringify(visionbank1))
+		$('.two .dropdown .options').empty()
+		for (var i = visionbank1.length - 1; i >= 0; i--) {
+			var el = makeCard(visionbank1[i][0], visionbank1[i][1])
+			el.addClass('vision-card')
+			$('.two .dropdown .options').append(el)
+		}
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'vision-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		pushCards(visionbank1, 'vision-card')
+		shuffleArray(current_cards)
+	}else if(bank =='three'){
+		localStorage.setItem('processbank',JSON.stringify(processbank1))
+		$('.three .dropdown .options').empty()
+		for (var i = processbank1.length - 1; i >= 0; i--) {
+			var el = makeCard(processbank1[i][0], processbank1[i][1])
+			el.addClass('process-card')
+			$('.three .dropdown .options').append(el)
+		}
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'process-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		pushCards(processbank1, 'process-card')
+		shuffleArray(current_cards)
+	}else if(bank =='five'){
+		localStorage.setItem('actionbank',JSON.stringify(actionbank1))
+		$('.five .dropdown .options').empty()
+		for (var i = actionbank1.length - 1; i >= 0; i--) {
+			var el = makeCard(actionbank1[i][0], actionbank1[i][1])
+			el.addClass('action-card')
+			$('.five .dropdown .options').append(el)
+		}
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'action-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		pushCards(actionbank1, 'action-card')
+		shuffleArray(current_cards)
+	}else if(bank =='six'){
+		localStorage.setItem('reachbank',JSON.stringify(reachbank1))
+		$('.six .dropdown .options').empty()
+		for (var i = reachbank1.length - 1; i >= 0; i--) {
+			var el = makeCard(reachbank1[i][0], reachbank1[i][1])
+			el.addClass('reach-card')
+			$('.six .dropdown .options').append(el)
+		}
 
+		for (var i = current_cards.length - 1; i >= 0; i--) {
+			if(current_cards[i][2] == 'reach-card'){
+				current_cards.splice(i,1)
+			}
+		}
+		pushCards(reachbank1, 'reach-card')
+		shuffleArray(current_cards)
+		localStorage.setItem('current_cards',JSON.stringify(current_cards))
+	//repopulate cards in dropdown and in slideshow...
+	}
+	resetCards()
+})
+
+$(".input-area").submit(function(e){
+	e.preventDefault()
+	var bank = $(this).attr('data-bank');
+	var h1 = $(this).find("input[name='h1']").val()
+	var h3 = $(this).find("input[name='h3']").val()
+	var el = makeCard(h1,h3)
+	var my_class;
+	if(bank == 'one'){
+		var bank = JSON.parse(localStorage.getItem('goalsbank'))
+		bank.push([h1,h3])
+		localStorage.setItem('goalsbank', JSON.stringify(bank))
+		el.addClass('goals-card')
+		$('.one .dropdown .options').prepend(el)
+		my_class = 'goals-card'
+	} else if(bank == 'two'){
+		var bank = JSON.parse(localStorage.getItem('visionbank'))
+		bank.push([h1,h3])
+		localStorage.setItem('visionbank', JSON.stringify(bank))
+		el.addClass('vision-card')
+		$('.two .dropdown .options').prepend(el)
+		my_class = 'vision-card'
+	} else if(bank == 'three'){
+		var bank = JSON.parse(localStorage.getItem('processbank'))
+		bank.push([h1,h3])
+		localStorage.setItem('processbank', JSON.stringify(bank))
+		el.addClass('process-card')
+		$('.three .dropdown .options').prepend(el)
+		my_class = 'process-card'
+	} else if (bank == 'five'){
+		var bank = JSON.parse(localStorage.getItem('actionbank'))
+		bank.push([h1,h3])
+		localStorage.setItem('actionbank',JSON.stringify(bank))
+		el.addClass('action-card')
+		$('.five .dropdown .options').prepend(el)
+		my_class = 'action-card'
+	} else if(bank == 'six'){
+		var bank = JSON.parse(localStorage.getItem('reachbank'))
+		bank.push([h1,h3])
+		localStorage.setItem('reachbank', JSON.stringify(bank))
+		el.addClass('reach-card')
+		$('.six .dropdown .options').prepend(el)
+		my_class = 'reach-card'
+
+	}
+
+	// var current_cards2 = JSON.parse(localStorage.getItem('current_cards'));
+	current_cards.push([h1,h3,my_class])
+	localStorage.setItem('current_cards', JSON.stringify(current_cards))
+	resetCards()
+
+	})
+}
